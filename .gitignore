@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Local work
+*.bak
+*.original
+*.tmp
+test_data/
