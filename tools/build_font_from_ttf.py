@@ -306,11 +306,18 @@ def inject(base_vfont_path: str, base_vfont0_path: str,
            ttf_path: str, codepoints: list[int],
            out_vfont_path: str, out_vfont0_path: str,
            joining: bool = False,
-           ext_funits: float = 0.0) -> None:
+           ext_funits: float = 0.0,
+           shift_fraction: float = SHIFT_FU_FRACTION) -> None:
     """Inject new glyphs from a TTF into a copy of an existing font pair.
 
     Existing records are preserved unchanged. New records replace any
     existing records with the same codepoint.
+
+    `shift_fraction` controls the Latin-style LSB shift applied to every
+    new glyph's vertices along X. The default (0.6) is correct for
+    scripts whose TTF places ink near the glyph origin (Arabic, Hebrew,
+    Thai, Devanagari). Set to 0.0 for scripts whose TTF already has
+    Latin-style LSB (Cyrillic, extended Latin, Greek).
     """
     with open(base_vfont_path, 'rb') as f:
         vf = parse_vfont(f.read())
@@ -320,7 +327,7 @@ def inject(base_vfont_path: str, base_vfont0_path: str,
     face = freetype.Face(ttf_path)
     upm = face.units_per_EM
     tag = vf.records[0].tag if vf.records else 0
-    shift = upm * SHIFT_FU_FRACTION
+    shift = upm * shift_fraction
 
     existing = {r.cp: r for r in vf.records}
 
@@ -381,6 +388,10 @@ def main() -> None:
                     help='Enable baseline mesh extension for joining scripts (Arabic).')
     ap.add_argument('--ext', type=float, default=250.0,
                     help='Extension width in font units (default: 250).')
+    ap.add_argument('--shift-fraction', type=float, default=SHIFT_FU_FRACTION,
+                    help=f'LSB shift as a fraction of UPM (default: {SHIFT_FU_FRACTION}). '
+                         f'Set to 0 to disable. Latin-style scripts (Cyrillic, etc.) '
+                         f'whose TTF already provides Latin-style LSB do not need a shift.')
     args = ap.parse_args()
 
     if not args.range:
@@ -392,7 +403,8 @@ def main() -> None:
 
     inject(args.base, args.base0, args.ttf, codepoints,
            args.out_vfont, args.out_vfont0,
-           joining=args.joining, ext_funits=args.ext if args.joining else 0.0)
+           joining=args.joining, ext_funits=args.ext if args.joining else 0.0,
+           shift_fraction=args.shift_fraction)
 
 
 if __name__ == '__main__':

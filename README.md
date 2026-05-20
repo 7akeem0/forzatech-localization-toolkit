@@ -31,30 +31,28 @@ ForzaTech هو المحرك اللي تستخدمه Playground Games و Turn 10 
 ## البدء السريع
 
 ```bash
-git clone https://github.com/<user>/forzatech-localization-toolkit
+git clone https://github.com/7akeem0/forzatech-localization-toolkit
 cd forzatech-localization-toolkit
 pip install -r requirements.txt
 ```
 
-استخراج كل النصوص من ملف لغة:
+للمشي خطوة-بخطوة عبر التعريب الكامل (٨ خطوات، يناسب أي لغة):
+
+**📖 [اقرا QUICKSTART.md](QUICKSTART.md)**
+
+ثلاث أمثلة جاهزة في `examples/`:
 
 ```bash
-python examples/01_extract_all_strings.py /path/to/EN.zip ./output_json
+# استخراج كل النصوص لصيغة JSON قابلة للترجمة
+python examples/01_extract_all_strings.py /path/to/EN.zip ./strings_json
+
+# إعادة بناء جدول نصوص بعد التعديل
+python examples/02_modify_one_string.py ./strings_json /path/to/EN.zip output.zip
+
+# بناء خط مخصّص من TTF
+python examples/03_build_custom_font.py NotoSans.ttf out.vfont out.vfont0 \
+    --base Horizon_A.vfont --base0 Horizon_A.vfont0 --range 0x0400 0x04FF
 ```
-
-إعادة بناء جدول نصوص معدّل:
-
-```bash
-python examples/02_modify_one_string.py ./output_json /path/to/EN.zip
-```
-
-بناء خط مخصّص من TTF:
-
-```bash
-python examples/03_build_custom_font.py NotoSans.ttf Horizon_Custom.vfont
-```
-
-شوف `examples/` للأمثلة القابلة للتشغيل، و `docs/` للمواصفات الكاملة.
 
 ---
 
@@ -62,6 +60,8 @@ python examples/03_build_custom_font.py NotoSans.ttf Horizon_Custom.vfont
 
 | الملف | الموضوع |
 |---|---|
+| [`QUICKSTART.md`](QUICKSTART.md) | دليل خطوة-بخطوة من البداية للنهاية (ابدأ من هنا) |
+| [`docs/install.md`](docs/install.md) | تخطيط ملفات اللعبة، النسخ الاحتياطي، وضع التركيب |
 | [`docs/str_format.md`](docs/str_format.md) | تنسيق `.str` الثنائي (header، sections، hash-linked key↔value) |
 | [`docs/vfont_format.md`](docs/vfont_format.md) | `.vfont`: slot table، glyph records، kerning trailer، font fingerprint tags |
 | [`docs/vfont0_format.md`](docs/vfont0_format.md) | `.vfont0`: atlas prelude، per-glyph blob، vertex/index encoding |
@@ -79,8 +79,9 @@ python examples/03_build_custom_font.py NotoSans.ttf Horizon_Custom.vfont
 |---|---|
 | `tools/str_codec.py` | قراءة وكتابة ملفات `.str`. roundtrip متحقّق منه. |
 | `tools/vfont_codec.py` | قراءة وكتابة ملفات `.vfont` و `.vfont0`. roundtrip متحقّق منه. |
-| `tools/ui_zip_patcher.py` | Slot-preserving patcher لـ`UI.zip`. يحافظ على كل الـ4 KB-aligned data offsets. |
 | `tools/build_font_from_ttf.py` | يبني `.vfont` + `.vfont0` من خط TrueType. يتعامل مع أي نطاق codepoints. |
+| `tools/patch_fontsettings.py` | يصلّح سلاسل الـfallback في `fontsettings.xml` بحيث كل الأوزان (Bold/Condensed) ترجع للخط اللي حقنت فيه السكربت الجديد. |
+| `tools/ui_zip_patcher.py` | Slot-preserving patcher لـ`UI.zip`. يحافظ على كل الـ4 KB-aligned data offsets. |
 
 ---
 
@@ -119,7 +120,7 @@ python examples/03_build_custom_font.py NotoSans.ttf Horizon_Custom.vfont
 ## الترخيص
 
 - **الكود** (`tools/`, `examples/`): رخصة MIT. شوف [`LICENSE`](LICENSE).
-- **التوثيق** (`docs/`, `README.md`, `STORY.md`): Creative Commons Attribution 4.0 (CC-BY-4.0).
+- **التوثيق** (`docs/`, `README.md`, `STORY.md`, `QUICKSTART.md`): Creative Commons Attribution 4.0 (CC-BY-4.0).
 
 ---
 
@@ -135,6 +136,16 @@ This repository documents the binary formats and provides Python tools to read a
 
 Companion to this work: the [first complete Arabic localization mod for Forza Horizon 6](https://www.nexusmods.com/forzahorizon6/mods/65), shipped on Nexus Mods as a reference implementation. The mod itself is outside the scope of this repository; what is documented here is the underlying engine work that made it possible.
 
+### Quick start
+
+```bash
+git clone https://github.com/7akeem0/forzatech-localization-toolkit
+cd forzatech-localization-toolkit
+pip install -r requirements.txt
+```
+
+For a full end-to-end walkthrough (8 steps, generic across all scripts): see **[QUICKSTART.md](QUICKSTART.md)**.
+
 ### What was reverse-engineered
 
 | Subsystem | Status | Verification |
@@ -146,6 +157,18 @@ Companion to this work: the [first complete Arabic localization mod for Forza Ho
 | Slot-preserving PKZIP repack technique | Documented + tool | Required to modify UI without breaking memory-mapped offsets |
 | Silent integrity checks (catalog) | Documented | List of files that cannot be modified even with correct CRC |
 | Latin-LSB glyph convention | Documented | Engine assumption affecting all non-Latin scripts |
+
+### Documentation
+
+Start with [`QUICKSTART.md`](QUICKSTART.md) and [`docs/install.md`](docs/install.md). The remaining docs in `docs/` are formal specifications for each subsystem. [`STORY.md`](STORY.md) is a narrative of the reverse-engineering journey.
+
+### Tools
+
+- `tools/str_codec.py` — `.str` reader/writer (verified roundtrip).
+- `tools/vfont_codec.py` — `.vfont` and `.vfont0` reader/writer (verified roundtrip).
+- `tools/build_font_from_ttf.py` — generates a `.vfont` + `.vfont0` from any TrueType font.
+- `tools/patch_fontsettings.py` — rewrites font fallback chains so all weights resolve through your modified font.
+- `tools/ui_zip_patcher.py` — slot-preserving patcher for `UI.zip` (preserves the 4 KB-aligned data offsets).
 
 ### Why this exists
 
@@ -162,4 +185,4 @@ Reverse engineering, documentation, and tools: **Hesham**. The Arabic localizati
 ### License
 
 - **Code** (`tools/`, `examples/`): MIT License.
-- **Documentation** (`docs/`, `README.md`, `STORY.md`): Creative Commons Attribution 4.0 (CC-BY-4.0).
+- **Documentation** (`docs/`, `README.md`, `STORY.md`, `QUICKSTART.md`): Creative Commons Attribution 4.0 (CC-BY-4.0).

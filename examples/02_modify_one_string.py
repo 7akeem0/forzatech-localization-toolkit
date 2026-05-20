@@ -36,15 +36,40 @@ def preprocess(value: str) -> str:
     """
     Hook for script-specific text preprocessing.
 
-    For LTR scripts (Cyrillic, Latin extensions, Greek): return value as-is.
+    Edit this function to match your script category. Below are recipes
+    for each category — uncomment one and remove the others.
 
-    For RTL scripts (Arabic, Hebrew, Persian, Urdu):
+    --------------------------------------------------------------------
+    Category A — LTR alphabetic (Cyrillic, extended Latin, Greek):
+        return value
+    --------------------------------------------------------------------
+    Category B — LTR complex (Thai, Devanagari, Lao, Khmer):
+        # Pre-wrap if your script lacks inter-word spaces and the engine's
+        # space-based word wrap leaves long lines overflowing the panel.
+        # Insert U+200B (zero-width space) at syllable boundaries OR
+        # hard-wrap by inserting '\\n' at a fixed character count.
+        return value
+    --------------------------------------------------------------------
+    Category C — RTL with joining (Arabic, Persian, Urdu, Syriac):
         import arabic_reshaper
         from bidi.algorithm import get_display
-        return get_display(arabic_reshaper.reshape(value))
+        # Multi-line aware: prep each line independently so paragraph
+        # order isn't reversed along with character order.
+        lines = []
+        for line in value.split('\\n'):
+            shaped = arabic_reshaper.reshape(line)
+            lines.append(get_display(shaped))
+        return '\\n'.join(lines)
+    --------------------------------------------------------------------
+    Category D — RTL without joining (Hebrew):
+        lines = []
+        for line in value.split('\\n'):
+            lines.append(line[::-1])
+        return '\\n'.join(lines)
+    --------------------------------------------------------------------
 
-    For complex LTR scripts with marks (Thai, Devanagari): may need
-    Unicode normalization (NFC) but no reversal.
+    See docs/rtl_in_ltr_engines.md for advanced RTL handling (placeholder
+    preservation, soft-wrap, mixed-direction content).
     """
     return value
 
