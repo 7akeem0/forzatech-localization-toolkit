@@ -87,7 +87,7 @@ python examples/03_build_custom_font.py NotoSans.ttf out.vfont out.vfont0 \
 
 ## ليش هذا المشروع موجود
 
-سلسلة Forza تشحن بـ٢٤ لغة رسمية. مجتمعات لغوية كثيرة (تايلندي، أوكراني، فيتنامي، عبري، هندي، فارسي، وغيرها) ما عندها دعم رسمي. قبل هذا المستودع، التعريب الفاني كان محجوز خلف ثلاث مشاكل ما تم حلّها:
+سلسلة Forza تشحن بـ٢٤ لغة رسمية. مجتمعات لغوية كثيرة (تايلندي، أوكراني، فيتنامي، هندي، فارسي، وغيرها) ما عندها دعم رسمي. قبل هذا المستودع، التعريب الفاني كان محجوز خلف ثلاث مشاكل ما تم حلّها:
 
 ١. تنسيق `.str` كان مغلق. النصوص ما تنفع تتستخرج أو تترجع.
 ٢. تنسيقا `.vfont` / `.vfont0` كانا مغلقين. ما ينفع تضاف glyphs جديدة.
@@ -172,7 +172,7 @@ Start with [`QUICKSTART.md`](QUICKSTART.md) and [`docs/install.md`](docs/install
 
 ### Why this exists
 
-The Forza franchise ships with 24 official text locales. Many language communities (Thai, Ukrainian, Vietnamese, Hebrew, Hindi, Persian, and others) have no first-party support. Before this toolkit, fan localization was blocked by three unsolved problems: the `.str` format was opaque, the `.vfont` / `.vfont0` formats were opaque, and `UI.zip` used a custom `0x1123` extra field that caused crashes if not preserved correctly. All three are documented and solved here.
+The Forza franchise ships with 24 official text locales. Many language communities (Thai, Ukrainian, Vietnamese, Hindi, Persian, and others) have no first-party support. Before this toolkit, fan localization was blocked by three unsolved problems: the `.str` format was opaque, the `.vfont` / `.vfont0` formats were opaque, and `UI.zip` used a custom `0x1123` extra field that caused crashes if not preserved correctly. All three are documented and solved here.
 
 ### Anti-cheat compatibility
 

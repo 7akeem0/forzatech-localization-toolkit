@@ -11,7 +11,6 @@ Pick the row that matches your target script. The choices propagate through late
 | **A — LTR alphabetic** | Cyrillic, extended Latin, Greek, Vietnamese | Standard pipeline. Disable the LSB shift. No text reshaping. |
 | **B — LTR complex** | Thai, Devanagari, Lao, Khmer, Burmese, Sinhala | Standard pipeline. Apply the LSB shift. No reshaping. Word-wrap by character count, not by space. |
 | **C — RTL with joining** | Arabic, Persian, Urdu, Syriac | Generate Presentation Forms glyphs. Apply LSB shift and mesh extension. Preprocess strings: shape → reverse. |
-| **D — RTL without joining** | Hebrew | Standard pipeline on base block. Apply LSB shift. Preprocess strings: reverse only. |
 
 If your script is not listed, pick the row whose characteristics match: does the script connect adjacent letters (Arabic-like) or not (Latin-like)? Does it have above-and-below marks (Thai-like, Devanagari-like)? Read direction?
 
@@ -103,16 +102,6 @@ python tools/build_font_from_ttf.py YourFont.ttf Horizon_A.new.vfont Horizon_A.n
     --joining --ext 250
 ```
 
-**Category D (Hebrew, ...):**
-
-Generate the base block. Shift enabled, no mesh extension (no joining):
-
-```bash
-python tools/build_font_from_ttf.py YourFont.ttf Horizon_A.new.vfont Horizon_A.new.vfont0 \
-    --base Horizon_A.vfont --base0 Horizon_A.vfont0 \
-    --range 0x0590 0x05FF
-```
-
 The output is a `.vfont` and a `.vfont0` you will pack back into `Fonts.zip` in step 7.
 
 ## 6. Patch the font fallback chain
@@ -153,9 +142,8 @@ The injection script needs a small hook for script-specific text preprocessing. 
 | A — LTR alphabetic | `return value` (no change) |
 | B — LTR complex | `return value` (no change) — but mind word-wrap behavior; see note below |
 | C — RTL joining | `from arabic_reshaper import reshape; from bidi.algorithm import get_display; return get_display(reshape(value))` |
-| D — RTL no-joining | `return value[::-1]` |
 
-For category C/D you also typically want multi-line and soft-wrap handling. See [`docs/rtl_in_ltr_engines.md`](docs/rtl_in_ltr_engines.md) for the complete recipe.
+For category C you also typically want multi-line and soft-wrap handling. See [`docs/rtl_in_ltr_engines.md`](docs/rtl_in_ltr_engines.md) for the complete recipe.
 
 For category B, the engine wraps text at spaces. Scripts without inter-word spaces (Thai, Khmer, Lao, ...) may render entire paragraphs as a single long line that overflows the panel. Pragmatic workarounds: insert a zero-width space (U+200B) at syllable boundaries during translation, or pre-wrap at a fixed character count by inserting `\n` directly.
 
@@ -220,6 +208,6 @@ This toolkit handles the engineering side of localization: file formats, fonts, 
 - Skim [`STORY.md`](STORY.md) for the reverse-engineering background and why each design decision was made.
 - Read [`docs/install.md`](docs/install.md) for the complete file layout.
 - Read the document for your script category in depth before producing the final build:
-  - **A/B/D**: [`docs/latin_lsb_convention.md`](docs/latin_lsb_convention.md)
+  - **A/B**: [`docs/latin_lsb_convention.md`](docs/latin_lsb_convention.md)
   - **C**: [`docs/rtl_in_ltr_engines.md`](docs/rtl_in_ltr_engines.md) + the LSB doc above.
 - Read [`docs/silent_integrity_checks.md`](docs/silent_integrity_checks.md) to know which files **not** to touch.

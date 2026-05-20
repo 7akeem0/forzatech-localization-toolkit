@@ -1,14 +1,14 @@
 # Rendering RTL Scripts in an LTR Engine
 
-ForzaTech has no Bidirectional or shaping support. It renders text strictly left-to-right in codepoint order. For RTL scripts (Arabic, Hebrew, Persian, Urdu, Syriac), the strings must be preprocessed offline so that the codepoints already appear in the order the engine will draw them.
+ForzaTech has no Bidirectional or shaping support. It renders text strictly left-to-right in codepoint order. For RTL scripts (Arabic, Persian, Urdu, Syriac), the strings must be preprocessed offline so that the codepoints already appear in the order the engine will draw them.
 
-This document is the general approach. Script-specific details (e.g. Arabic Presentation Forms B vs. Hebrew without joining) require per-script tuning.
+This document is the general approach. Script-specific details (e.g. Arabic Presentation Forms B vs. other RTL scripts) require per-script tuning.
 
 ## The two transformations
 
 To take logical-order RTL text and render it correctly through an LTR engine, two transformations are required:
 
-1. **Script shaping** — for scripts with contextual letterforms (Arabic, Syriac), replace each base letter with its appropriate connected form (initial / medial / final / isolated) based on its neighbors. The Unicode Presentation Forms blocks (`U+FB50..U+FDFF` Arabic A, `U+FE70..U+FEFF` Arabic B, `U+FB1D..U+FB4F` Hebrew) contain pre-shaped variants for direct substitution. For Hebrew, this step is essentially a no-op since Hebrew has no contextual shaping.
+1. **Script shaping** — for scripts with contextual letterforms (Arabic, Syriac), replace each base letter with its appropriate connected form (initial / medial / final / isolated) based on its neighbors. The Unicode Presentation Forms blocks (`U+FB50..U+FDFF` Arabic A, `U+FE70..U+FEFF` Arabic B) contain pre-shaped variants for direct substitution.
 
 2. **Visual reordering** — reverse the codepoint sequence so the visually-rightmost (logically-first) character is at the start of the string. The LTR engine draws codepoint 0 leftmost, codepoint N-1 rightmost; visual-order = reversed logical-order.
 
@@ -22,13 +22,6 @@ def prep_arabic(s: str) -> str:
     shaped = arabic_reshaper.reshape(s)
     # Step 2: reverse — for the LTR engine to draw rightmost-first
     return shaped[::-1]
-```
-
-For Hebrew:
-
-```python
-def prep_hebrew(s: str) -> str:
-    return s[::-1]   # no shaping needed; just reverse
 ```
 
 ## Why `arabic_reshaper` is needed

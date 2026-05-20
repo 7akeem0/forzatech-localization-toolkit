@@ -315,8 +315,8 @@ def inject(base_vfont_path: str, base_vfont0_path: str,
 
     `shift_fraction` controls the Latin-style LSB shift applied to every
     new glyph's vertices along X. The default (0.6) is correct for
-    scripts whose TTF places ink near the glyph origin (Arabic, Hebrew,
-    Thai, Devanagari). Set to 0.0 for scripts whose TTF already has
+    scripts whose TTF places ink near the glyph origin (Arabic, Thai,
+    Devanagari). Set to 0.0 for scripts whose TTF already has
     Latin-style LSB (Cyrillic, extended Latin, Greek).
     """
     with open(base_vfont_path, 'rb') as f:

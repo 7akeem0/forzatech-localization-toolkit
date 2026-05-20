@@ -2,7 +2,7 @@
 
 ForzaTech's text layout assumes that **every glyph mesh has a Latin-style left-side-bearing**: the leftmost vertex of the polygon should sit roughly `UPM × 0.5` font units to the right of the glyph origin.
 
-Latin glyphs from any standard TTF naturally have this property. Glyphs from other scripts often do not. If you generate Arabic, Hebrew, Thai, or similar glyphs directly from a TTF and inject them, **the leftmost glyph on each rendered line will be clipped on its left half** — the text container's clip rectangle assumes the Latin LSB and cuts through any glyph that violates it.
+Latin glyphs from any standard TTF naturally have this property. Glyphs from other scripts often do not. If you generate Arabic, Thai, or similar glyphs directly from a TTF and inject them, **the leftmost glyph on each rendered line will be clipped on its left half** — the text container's clip rectangle assumes the Latin LSB and cuts through any glyph that violates it.
 
 This document explains the cause and the fix.
 
@@ -60,7 +60,6 @@ A more thorough investigation would require shader / layout-engine decompilation
 
 This convention applies to **any** script that generates glyphs without a Latin-style LSB:
 
-- **Hebrew** — same as Arabic: ink starts near the origin, needs the shift.
 - **Thai** — ink starts near the origin, needs the shift.
 - **Devanagari** — ink starts near the origin, needs the shift.
 - **Korean Hangul** — typically has Latin-style LSB in standard fonts, may not need the shift; test with the diagnostic above.

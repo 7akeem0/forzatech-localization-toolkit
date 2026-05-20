@@ -218,7 +218,7 @@ The breakthrough was a per-glyph mesh dump. Latin glyphs were measured to have `
 
 The fix: shift every generated glyph's vertex X coordinates by `+UPM × 0.6` font units before normalization. After shift, `min_x ≈ +0.5`, matching Latin convention. The clip stops cutting.
 
-This is the [Latin LSB convention](docs/latin_lsb_convention.md). It applies to any script generated with naive geometry: Arabic, Hebrew, Thai, Devanagari, etc. Latin and Cyrillic from standard TTFs come pre-shifted; other scripts do not.
+This is the [Latin LSB convention](docs/latin_lsb_convention.md). It applies to any script generated with naive geometry: Arabic, Thai, Devanagari, etc. Latin and Cyrillic from standard TTFs come pre-shifted; other scripts do not.
 
 ## What's documented now
 

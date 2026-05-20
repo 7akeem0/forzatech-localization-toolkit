@@ -61,12 +61,6 @@ def preprocess(value: str) -> str:
             lines.append(get_display(shaped))
         return '\\n'.join(lines)
     --------------------------------------------------------------------
-    Category D — RTL without joining (Hebrew):
-        lines = []
-        for line in value.split('\\n'):
-            lines.append(line[::-1])
-        return '\\n'.join(lines)
-    --------------------------------------------------------------------
 
     See docs/rtl_in_ltr_engines.md for advanced RTL handling (placeholder
     preservation, soft-wrap, mixed-direction content).
